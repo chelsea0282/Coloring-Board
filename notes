@@ -1,0 +1,28 @@
+
+
+timer0 context switching
+timer1 real time timer 0.001sec 
+
+process_create --> created stack memory space, put it on the ready queue
+process_rt_create --> create stack memory space, deadline
+
+
+first compare all the deadlines of the processes (as to make the earliest go first)
+
+process select ()
+
+process_t p1 = p2 // copy of p2 and store into p1 (new memory space created)
+	access variables p1.sp
+process_t*p1 = p2 //makes a copy of the p2's memory address
+	access variables p1 ->sp
+
+
+queue points to the first element in the list bc it's a linked list :(((((((((((((((((((((
+
+
+x = 3
+y = x
+x = x+3
+
+deadline is of type realtime_t
+so inside realtime.h (realtime.c), I need to make a compare function that will compare the deadlines
