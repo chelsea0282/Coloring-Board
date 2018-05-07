@@ -4,6 +4,9 @@
 #include <gfxfont.h>
 #include <SPI.h>
 #include <Adafruit_ILI9341.h>
+//test out with this
+//#include "Adafruit_ILI9341.h" // Hardware-specific library
+#include <SD.h>
 
 Adafruit_ILI9341 tft = Adafruit_ILI9341(10, 9);
 PImage logo = tft.loadImage("GemImage.bmp");
