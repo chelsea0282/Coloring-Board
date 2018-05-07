@@ -4,8 +4,8 @@
  * This case will run the nonrealtime process (blinking the red LED 4 times)
  * to completion. Then there will be a pause where no process is running
  * as the realtime process's start time hasn't come yet, and then the realtime
- * processs will execute. At the end there will be 1 green flash as the realtime
- *process will have missed its deadline (this is ensured due to the delays)
+ * processs will execute. At the end there will not be a green flash as the realtime
+ *process will have met its deadline.
  *
  ************************************************************************/
  
@@ -89,7 +89,7 @@ int main(void) {
 
     /* Create processes */ 
     if (process_create(pNRT, NRT_STACK) < 0) { return -1; }
-    if (process_rt_create(pRT1, RT_STACK, &t_pRT1, &t_1msec) < 0) { return -1; } 
+    if (process_rt_create(pRT1, RT_STACK, &t_pRT1, &t_10sec) < 0) { return -1; } 
    
     /* Launch concurrent execution */
 	process_start();
