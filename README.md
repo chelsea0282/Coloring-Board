@@ -13,7 +13,7 @@ ECE 3140 Final Project Spring 2018
   5. (possibly later) print multiple different images. 
   6. (possibly later) 
   
-### Writing SPI library of our own
+### SPI connection between TFT and FRDM
 - referenced lots of SPI library online to base ours
 - found a tutorial PDF for setting up SPI
     https://community.nxp.com/docs/DOC-103944
