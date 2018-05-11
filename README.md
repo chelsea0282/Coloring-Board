@@ -2,6 +2,7 @@
 ECE 3140 Final Project Spring 2018
 
 ## Beginning Steps
+### Setting up Accelorometer 
 ### Testing TFT
 - tested the TFT screen using an Arduino Uno
 - tests of testing
@@ -12,14 +13,14 @@ ECE 3140 Final Project Spring 2018
      -> had to upload through SD card b/c too large of data
   5. (possibly later) print multiple different images. 
   6. (possibly later) 
-  
+ 
+## Connecting TFT and FRDM   
 ### SPI connection between TFT and FRDM
 - referenced lots of SPI library online to base ours
 - found a tutorial PDF for setting up SPI
     https://community.nxp.com/docs/DOC-103944
     file:///Users/seungyeonhan/Downloads/KSDK%20SPI%20Master-Slave%20with%20FRDM-K64F.pdf
-    
-
-    
+### Physical Connection
+Using the acclerometer on the FRDM board, had to allow long enough connection so that the board will move freely but also maintain the connection with the FRDM board. Decided to use a breadboard to maintain a stable connection between the TFT board and the breadboard, and breadboard to the FRDM board. However, have to keep in mind that SPI works best in close distances. 
   
 
