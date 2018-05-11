@@ -11,10 +11,15 @@ ECE 3140 Final Project Spring 2018
   4. print an image on the screen
      -> had to upload through SD card b/c too large of data
   5. (possibly later) print multiple different images. 
+  6. (possibly later) 
   
 ### Writing SPI library of our own
 - referenced lots of SPI library online to base ours
-- unsure wher ethe state is
+- found a tutorial PDF for setting up SPI
+    https://community.nxp.com/docs/DOC-103944
+    file:///Users/seungyeonhan/Downloads/KSDK%20SPI%20Master-Slave%20with%20FRDM-K64F.pdf
+    
+
     
   
 
