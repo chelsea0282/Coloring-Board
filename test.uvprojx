@@ -590,7 +590,7 @@
           <targetInfo name="Target 1"/>
         </targetInfos>
       </file>
-      <file attr="config" category="source" name="examples\frdmk64f\hardware_init.c" version="1.2.0">
+      <file attr="config" category="source" name="examples\frdmk64f\hardware_init.c">
         <instance index="0">RTE\Device\MK64FN1M0VLL12\hardware_init.c</instance>
         <component Capiversion="1.0" Cclass="Device" Cgroup="KSDK Configuration" Csub="FRDM-K64F" Cvendor="Keil" Cversion="1.2.0" condition="Kinetis FRDM-K64F"/>
         <package name="Kinetis_SDK_DFP" schemaVersion="1.4" url="http://www.keil.com/pack/" vendor="Keil" version="2.3.0"/>
