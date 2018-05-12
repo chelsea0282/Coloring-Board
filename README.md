@@ -4,8 +4,6 @@ ECE 3140 Final Project Spring 2018
 ## Beginning Steps
 ### Setting up Accelorometer 
 ### Testing TFT
-- Connecting the TFT Board: 
-  https://learn.adafruit.com/adafruit-2-dot-8-color-tft-touchscreen-breakout-v2/spi-wiring-and-test
 - tested the TFT screen using an Arduino Uno
 - tests of testing
   1. show colors on the screen
@@ -15,7 +13,6 @@ ECE 3140 Final Project Spring 2018
      -> had to upload through SD card b/c too large of data
   5. (possibly later) print multiple different images. 
   6. (possibly later) 
-
  
 ## Connecting TFT and FRDM   
 ### SPI connection between TFT and FRDM
@@ -27,3 +24,17 @@ ECE 3140 Final Project Spring 2018
 Using the acclerometer on the FRDM board, had to allow long enough connection so that the board will move freely but also maintain the connection with the FRDM board. Decided to use a breadboard to maintain a stable connection between the TFT board and the breadboard, and breadboard to the FRDM board. However, have to keep in mind that SPI works best in close distances. 
   
 
+## Accelerometer
+-Setup originally from Lab 6 handout
+
+## Applying Accelerometer Data
+- created variables:
+  *current position x
+  *current position y
+  *current position z
+  *previous position x
+  *previous position y
+  *previous position z
+  *velocity x
+  *velocity y
+  *velocity z
