@@ -6,6 +6,7 @@ ECE 3140 Final Project Spring 2018
 Setup originally from Lab 6 handout
 ### Testing TFT
 - tested the TFT screen using an Arduino Uno
+- Parts of the TFT board had to be soldered together following the instuctions in: https://learn.adafruit.com/adafruit-3-5-color-320x480-tft-touchscreen-breakout/spi-wiring-and-test
 - tests of testing
   1. show colors on the screen
   2. writ letters on the screen
