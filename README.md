@@ -4,6 +4,8 @@ ECE 3140 Final Project Spring 2018
 ## Beginning Steps
 ### Setting up Accelorometer 
 ### Testing TFT
+- Connecting the TFT Board: 
+  https://learn.adafruit.com/adafruit-2-dot-8-color-tft-touchscreen-breakout-v2/spi-wiring-and-test
 - tested the TFT screen using an Arduino Uno
 - tests of testing
   1. show colors on the screen
@@ -13,6 +15,7 @@ ECE 3140 Final Project Spring 2018
      -> had to upload through SD card b/c too large of data
   5. (possibly later) print multiple different images. 
   6. (possibly later) 
+
  
 ## Connecting TFT and FRDM   
 ### SPI connection between TFT and FRDM
