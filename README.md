@@ -22,8 +22,7 @@ Setup originally from Lab 6 handout
 - found a tutorial PDF for setting up SPI
     https://community.nxp.com/docs/DOC-103944
     file:///Users/seungyeonhan/Downloads/KSDK%20SPI%20Master-Slave%20with%20FRDM-K64F.pdf
-    
-    https://www.nxp.com/docs/en/reference-manual/KSDK20APIRM.pdf?&fpsp=1&WT_TYPE=Reference%20Manuals&WT_VENDOR=FREESCALE&WT_FILE_FORMAT=pdf&WT_ASSET=Documentation&fileExt=.pdf
+    *https://www.nxp.com/docs/en/reference-manual/KSDK20APIRM.pdf?&fpsp=1&WT_TYPE=Reference%20Manuals&WT_VENDOR=FREESCALE&WT_FILE_FORMAT=pdf&WT_ASSET=Documentation&fileExt=.pdf
     page 1000 is some SPI stuff
 ### Physical Connection
 FRDM Wiring: https://os.mbed.com/platforms/FRDM-K64F/
@@ -41,3 +40,9 @@ Using the acclerometer on the FRDM board, had to allow long enough connection so
   7. velocity x
   8. velocity y
   9. velocity z
+
+
+(Chelsea) - pick up from here
+https://stackoverflow.com/questions/2003505/how-do-i-delete-a-git-branch-both-locally-and-remotely
+https://learn.adafruit.com/circuitpython-basics-i2c-and-spi/spi-devices
+https://www.arduino.cc/en/Reference/TFTLibrary
