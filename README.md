@@ -28,12 +28,12 @@ Using the acclerometer on the FRDM board, had to allow long enough connection so
 
 ## Applying Accelerometer Data
 - created variables:
-  *current position x
-  *current position y
-  *current position z
-  *previous position x
-  *previous position y
-  *previous position z
-  *velocity x
-  *velocity y
-  *velocity z
+  1. current position x
+  2. current position y
+  3. current position z
+  4. previous position x
+  5. previous position y
+  6. previous position z
+  7. velocity x
+  8. velocity y
+  9. velocity z
