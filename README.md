@@ -46,3 +46,6 @@ Using the acclerometer on the FRDM board, had to allow long enough connection so
 https://stackoverflow.com/questions/2003505/how-do-i-delete-a-git-branch-both-locally-and-remotely
 https://learn.adafruit.com/circuitpython-basics-i2c-and-spi/spi-devices
 https://www.arduino.cc/en/Reference/TFTLibrary
+https://stackoverflow.com/questions/34296737/spi-driver-on-the-frdm-k64f-and-continuous-clock
+https://github.com/laswick/kinetis/tree/master/phase2_embedded_c
+https://fresh2refresh.com/c-programming/c-pointer/
