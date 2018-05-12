@@ -21,6 +21,8 @@ ECE 3140 Final Project Spring 2018
     https://community.nxp.com/docs/DOC-103944
     file:///Users/seungyeonhan/Downloads/KSDK%20SPI%20Master-Slave%20with%20FRDM-K64F.pdf
 ### Physical Connection
+FRDM Wiring: https://os.mbed.com/platforms/FRDM-K64F/
+TFT Wiring: https://learn.adafruit.com/adafruit-2-dot-8-color-tft-touchscreen-breakout-v2/spi-wiring-and-test
 Using the acclerometer on the FRDM board, had to allow long enough connection so that the board will move freely but also maintain the connection with the FRDM board. Decided to use a breadboard to maintain a stable connection between the TFT board and the breadboard, and breadboard to the FRDM board. However, have to keep in mind that SPI works best in close distances. 
   
 
