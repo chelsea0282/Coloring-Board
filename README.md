@@ -21,6 +21,9 @@ Setup originally from Lab 6 handout
 - found a tutorial PDF for setting up SPI
     https://community.nxp.com/docs/DOC-103944
     file:///Users/seungyeonhan/Downloads/KSDK%20SPI%20Master-Slave%20with%20FRDM-K64F.pdf
+    
+    https://www.nxp.com/docs/en/reference-manual/KSDK20APIRM.pdf?&fpsp=1&WT_TYPE=Reference%20Manuals&WT_VENDOR=FREESCALE&WT_FILE_FORMAT=pdf&WT_ASSET=Documentation&fileExt=.pdf
+    page 1000 is some SPI stuff
 ### Physical Connection
 FRDM Wiring: https://os.mbed.com/platforms/FRDM-K64F/
 TFT Wiring: https://learn.adafruit.com/adafruit-2-dot-8-color-tft-touchscreen-breakout-v2/spi-wiring-and-test
