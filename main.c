@@ -1,5 +1,5 @@
 #include <fsl_device_registers.h>                   // NXP::Device:Startup
-#include "MK64F12_features.h"           // NXP::Device:Startup
+//#include "MK64F12_features.h"           // NXP::Device:Startup
 #include "system_MK64F12.h"             // NXP::Device:Startup
 #include "board_magnetometer.h"
 #include "fsl_debug_console.h"
@@ -37,7 +37,7 @@ double MAX_Y = 240;
 double MIN_Y = 0;
 double MAX_X = 320;
 double MIN_X = 0;
-double WEIGHT = .00001;
+double WEIGHT = .00005;
 int w = 10;
 int h = 10;
 int c =  0xF800;
@@ -103,7 +103,7 @@ void PIT_begin(){
 	NVIC_SetPriority(PIT0_IRQn, 5);
 	SIM->SCGC6 |= (1<<23);
 	PIT->MCR = 0x04;
-	PIT->CHANNEL[0].LDVAL = 20970;
+	PIT->CHANNEL[0].LDVAL = 2097000;
 	PIT->CHANNEL[0].TCTRL |= 3;
 }
 
@@ -188,7 +188,6 @@ void setupGPIO(){
 		//setting up the pull down resistor and toggle on falling edge
 		PORTC->PCR[6] |= (1<<19);
 		PORTC->PCR[6] |= (1<<17);
-		PORTC->PCR[6] |= (1<<16);
 		PORTC->PCR[6] |= 0x3;
 	
     //setting up pins as outputs
