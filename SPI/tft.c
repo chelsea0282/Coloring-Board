@@ -149,9 +149,10 @@ static void writeColor(uint16_t c, uint32_t l) {
 
 /* Exposed TFT Functions */
 
+//srets up the TFT board to be able to transmit pictures
 void tft_begin() {
   // Enable ports B and E
-  SIM->SCGC5 |= (1 <<  10) | (1 <<  13);
+  SIM->SCGC5 |= (1 <<  10) | (1 <<  13) |(1 <<  12)|(1 <<  11);
 
   set_output(TFT_CLK);
   set_output(TFT_MOSI);
@@ -196,6 +197,7 @@ void tft_begin() {
   close();
 }
 
+//reads the status of whiting an image to the TFT
 uint8_t tft_read_command(uint8_t command) {
   open();
   send(0xD9, 1, (uint8_t[]) {0x10});
@@ -205,6 +207,8 @@ uint8_t tft_read_command(uint8_t command) {
   return r;
 }
 
+//Creates a rectangle of width w and height h at position
+//x,y and fills it with color c
 void tft_fill_screen(int x, int y, int w, int h, int c) {
   open();
 
