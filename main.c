@@ -4,11 +4,7 @@
 #include "board_magnetometer.h"
 #include "fsl_debug_console.h"
 #include "board.h"
-
-//hold x,y,z positions 
-double pos_y;
-double pos_x;
-double pos_z;
+#include "tft.h"
 
 
 //***********Forward Declaration of Methods****************************************
@@ -29,16 +25,22 @@ int drawingPause;
 //global variables to hold all of the mageleration values
 float mag_y;
 float mag_x;
-float mag_z;
+//hold x,y positions 
+double pos_y;
+double pos_x;
 //**********************************************************************************
 
 //***********************Constants**************************************************
 int MAG_ZERO_X;
 int MAG_ZERO_Y;
-int MAG_ZERO_Z;
-double MAX_X = 2000;
-double MIN_X = -2000;
+double MAX_Y = 240;
+double MIN_Y = 0;
+double MAX_X = 320;
+double MIN_X = 0;
 double WEIGHT = .00001;
+int w = 10;
+int h = 10;
+int c =  0xF800;
 //**********************************************************************************
 
 
@@ -48,34 +50,45 @@ int main(){
 	PTE->PCOR |= (1<<26);
 	//continuously updating the magnetometer values
 	while(1){
-		//disable interrupts to make updating variables atomic
-		PIT->CHANNEL[0].TCTRL &= ~(2);
+	
 		//getting new magnetometer state
 		Magnetometer_GetState(&state);
 		
-		//updating magnetometer values
-		//using a thresholding around the average value
+
+		
+		//updating magnetometer values with zeroing
 		mag_x = state.x - MAG_ZERO_X;
 		mag_y = state.y - MAG_ZERO_Y;
-		mag_z = state.z - MAG_ZERO_Z;
+		
+		//thresholding
 		if(15 > mag_x && mag_x > -15){
 			mag_x = 0;
 		}
 		if(15 > mag_y && mag_y > -15){
 			mag_y = 0;
 		}
-		if(15 > mag_z && mag_z > -15){
-			mag_z = 0;
-		}
 		
-		//updating position values
-		double temp = pos_x + mag_x*WEIGHT; 
-		if(temp <= MAX_X || temp >= MIN_X)
-			pos_x = temp;
-		else if(temp >= MAX_X)
+		//disable interrupts to make updating variables atomic
+		//so not only x or y is updated before drawing
+		PIT->CHANNEL[0].TCTRL &= ~(2);
+		
+		//updating position values if they are in range and setting
+		//them to the max values if not
+		double tempx = pos_x + mag_x*WEIGHT; 
+		if(tempx <= MAX_X || tempx >= MIN_X)
+			pos_x = tempx;
+		else if(tempx >= MAX_X)
 			pos_x = MAX_X;
 		else
 			pos_x = MIN_X;
+		
+		double tempy = pos_y + mag_y*WEIGHT; 
+		if(tempy <= MAX_Y || tempy >= MIN_Y)
+			pos_y = tempy;
+		else if(tempy >= MAX_Y)
+			pos_y = MAX_Y;
+		else
+			pos_y = MIN_Y;
 		
 		//reenable interrupts 
 		PIT->CHANNEL[0].TCTRL |= 2;
@@ -90,14 +103,13 @@ void PIT_begin(){
 	NVIC_SetPriority(PIT0_IRQn, 5);
 	SIM->SCGC6 |= (1<<23);
 	PIT->MCR = 0x04;
-	PIT->CHANNEL[0].LDVAL = 1000000;
-	debug_printf("PIT setup Success");
+	PIT->CHANNEL[0].LDVAL = 20970;
 	PIT->CHANNEL[0].TCTRL |= 3;
 }
 
 //Interrupt handler for the pushbutton SW2 on the board
 //If pushed this button should toggle the drawing functionality of the board
-//indicated by whether or not the green led is on
+//indicated by whether or not the green led is on or red led is on
 void PORTC_IRQHandler(){
 	if(drawingPause){
  		drawingPause = 0;
@@ -114,15 +126,16 @@ void PORTC_IRQHandler(){
 
 
 //IRQ Handler to update the drawing page every millisecond
-//Currently implemented to show the current mag states
 void PIT0_IRQHandler(){
-	PIT->CHANNEL[0].TFLG |= 1;
 	if(!drawingPause){
-		debug_printf("Xmag: %5d Ymag: %5d\r\n", mag_x, mag_y);
+		//converting the positions to integer values
+		int x = pos_x/1;
+		int y = pos_y/1;
+		//drawing on the screen with the position
+		tft_fill_screen(x,y,w,h,c);
+		
 	}
-	else{
-	  debug_printf("Drawing is Paused");
-	}
+	PIT->CHANNEL[0].TFLG |= 1;
 }
 
 //a helper function that just delays a small amount of time
@@ -133,6 +146,8 @@ void delay(){
 //a helper function that just sets all global
 //values equal to 0 and sets up all other aspects
 void setup(){
+	//setup the TFT board
+	tft_begin();
 	//setup the GPIO pins
 	setupGPIO();
 	//initialize the magnetometer
@@ -141,21 +156,17 @@ void setup(){
 	//setting the magelerometer offsets
 	int tempx = 0;
 	int tempy = 0;
-	int tempz = 0;
 	for(int i = 0; i <1000; i++){
 		Magnetometer_GetState(&state);
 		tempx += state.x;
 		tempy += state.y;
-		tempz += state.z;
 	}
 	MAG_ZERO_X = tempx/1000;
 	MAG_ZERO_Y = tempy/1000;
-	MAG_ZERO_Z = tempz/1000;
 	
 	//setting all global variables to zero
 	mag_y = 0;
 	mag_x = 0;
-	mag_z = 0;
 	drawingPause = 0;
 	//begin the PIT timer
 	PIT_begin();
@@ -167,14 +178,8 @@ void setup(){
 void setupGPIO(){
 		NVIC_EnableIRQ(PORTC_IRQn);
 		NVIC_SetPriority(PORTC_IRQn, 3);
-	  //setting up clock 
-	  SIM -> SCGC5 |= (1<<10);      	//ENABLE clock to PORT B
-	  SIM ->SCGC5 |= (1<<13);					//Enable clock to PORT E
-		SIM ->SCGC5 |= (1<<11);					//Enable clock to PORT C
-	
 	
     //setting pins as GPIO
-	  PORTB -> PCR[21] = (1<<8);    //PTB21 (blue LED) is now GPIO
 	  PORTB -> PCR[22] = (1<<8);		//PTB22 (red LED) is now GPIO
 		PORTE -> PCR[26] = (1<<8);    //PTE26 (green LED) is now GPIO 
 		PORTC -> PCR[6] = (1<<8);			//PTC6 (SW2) is now GPIO
@@ -187,7 +192,6 @@ void setupGPIO(){
 		PORTC->PCR[6] |= 0x3;
 	
     //setting up pins as outputs
-		PTB -> PDDR |= (1<<21);
 		PTB -> PDDR |= (1<<22);
 		PTE -> PDDR |= (1<<26);
 		
@@ -195,7 +199,6 @@ void setupGPIO(){
 		PTC -> PDDR &= ~(1<<6);
 		
 		//turning off the LEDs initially
-		PTB->PTOR |= (1<<21); // blue LED toggle
 		PTB->PTOR |= (1<<22);
 		PTE->PTOR |= (1<<26); // green LED toggle
 }
