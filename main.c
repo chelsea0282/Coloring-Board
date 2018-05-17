@@ -1,149 +1,201 @@
-#include "board_accelerometer.h"
+#include <fsl_device_registers.h>                   // NXP::Device:Startup
+#include "MK64F12_features.h"           // NXP::Device:Startup
+#include "system_MK64F12.h"             // NXP::Device:Startup
+#include "board_magnetometer.h"
 #include "fsl_debug_console.h"
 #include "board.h"
 
-//position type to hold x,y,z positions 
-typedef struct{
-	float y;
-	float x;
-	float z;
-} position_t;
+//hold x,y,z positions 
+double pos_y;
+double pos_x;
+double pos_z;
+
 
 //***********Forward Declaration of Methods****************************************
 void setup(void);
 void PIT_begin(void);
 void PIT0_IRQHandler(void);
 void delay(void);
-position_t * positionInit(void);
+void PORTC_ITQHandler(void);
+void setupGPIO(void);
 //*********************************************************************************
 
 //******************Global Variables***********************************************
-//The acceleration state of the FRDM
-ACCELEROMETER_STATE state;
-//global variables to hold all of the acceleration values
-int acc_y;
-int acc_x;
-int acc_z;
-//global variables to hold all of the velocity values
-volatile float vel_y;
-volatile float vel_x;
-volatile float vel_z;
-//global variable to hold the current position of the board
-position_t* currentPosition;
+//The mageleration state of the FRDM
+MAGNETOMETER_STATE state;
+
+//whether or not the drawing is paused
+int drawingPause;
+//global variables to hold all of the mageleration values
+float mag_y;
+float mag_x;
+float mag_z;
 //**********************************************************************************
 
 //***********************Constants**************************************************
-int ACCEL_ZERO_X;
-int ACCEL_ZERO_Y;
-int ACCEL_ZERO_Z;
-float DELAY_TIME = .01;
+int MAG_ZERO_X;
+int MAG_ZERO_Y;
+int MAG_ZERO_Z;
+double MAX_X = 2000;
+double MIN_X = -2000;
+double WEIGHT = .00001;
 //**********************************************************************************
 
 
 int main(){
-	//initializing everything 
-	hardware_init();
-	Accelerometer_Initialize();
+	//initializing everything  
 	setup();
-	currentPosition = positionInit();
-	PIT_begin();
-	
-	//continuously updating the position, speed and acceleration values
+	PTE->PCOR |= (1<<26);
+	//continuously updating the magnetometer values
 	while(1){
-		delay();
-		//getting new acceleration state
-		Accelerometer_GetState(&state);
+		//disable interrupts to make updating variables atomic
+		PIT->CHANNEL[0].TCTRL &= ~(2);
+		//getting new magnetometer state
+		Magnetometer_GetState(&state);
 		
-		//updating acceleration values
+		//updating magnetometer values
 		//using a thresholding around the average value
-		acc_x = state.x - ACCEL_ZERO_X;
-		acc_y = state.y - ACCEL_ZERO_Y;
-		acc_z = state.z - ACCEL_ZERO_Z;
-		if(20 > acc_x && acc_x > -20){
-			acc_x = 0;
+		mag_x = state.x - MAG_ZERO_X;
+		mag_y = state.y - MAG_ZERO_Y;
+		mag_z = state.z - MAG_ZERO_Z;
+		if(15 > mag_x && mag_x > -15){
+			mag_x = 0;
 		}
-		if(20 > acc_y && acc_y > -20){
-			acc_y = 0;
+		if(15 > mag_y && mag_y > -15){
+			mag_y = 0;
 		}
-		if(20 > acc_z && acc_z > -20){
-			acc_z = 0;
+		if(15 > mag_z && mag_z > -15){
+			mag_z = 0;
 		}
-		
-		
-		//updating velocity values
-		vel_x = vel_x + acc_x*DELAY_TIME;
-		vel_y = vel_y + acc_y*DELAY_TIME;
-		vel_z = vel_z + acc_z*DELAY_TIME;
 		
 		//updating position values
-		currentPosition->x = currentPosition->x + vel_x*DELAY_TIME;
-		currentPosition->y = currentPosition->y + vel_y*DELAY_TIME;
-		currentPosition->z = currentPosition->z + vel_z*DELAY_TIME;
+		double temp = pos_x + mag_x*WEIGHT; 
+		if(temp <= MAX_X || temp >= MIN_X)
+			pos_x = temp;
+		else if(temp >= MAX_X)
+			pos_x = MAX_X;
+		else
+			pos_x = MIN_X;
+		
+		//reenable interrupts 
+		PIT->CHANNEL[0].TCTRL |= 2;
 		
 	}
 }
 
 
-//TODO 
 //PIT timer setup
 void PIT_begin(){
-	SIM->SCGC6 = SIM_SCGC6_PIT_MASK;
-	PIT->MCR &= ~(1<<1);
-	PIT->CHANNEL[0].LDVAL = DEFAULT_SYSTEM_CLOCK;
-	PIT->CHANNEL[0].TCTRL = 3;
-	NVIC_EnableIRQ(PIT0_IRQn);
+	NVIC_EnableIRQ(PIT0_IRQn); 
+	NVIC_SetPriority(PIT0_IRQn, 5);
+	SIM->SCGC6 |= (1<<23);
+	PIT->MCR = 0x04;
+	PIT->CHANNEL[0].LDVAL = 1000000;
+	debug_printf("PIT setup Success");
+	PIT->CHANNEL[0].TCTRL |= 3;
+}
+
+//Interrupt handler for the pushbutton SW2 on the board
+//If pushed this button should toggle the drawing functionality of the board
+//indicated by whether or not the green led is on
+void PORTC_IRQHandler(){
+	if(drawingPause){
+ 		drawingPause = 0;
+		PTB->PSOR |= (1<<22);
+		PTE->PCOR |= (1<<26);
+	}
+	else{
+		drawingPause = 1;
+		PTB->PCOR |= (1<<22);
+		PTE->PSOR |= (1<<26);
+	}
+	PORTC->ISFR |= (1<<6);
 }
 
 
-//TODO
 //IRQ Handler to update the drawing page every millisecond
-//Currently implemented to show the current pos, speed, and accel
+//Currently implemented to show the current mag states
 void PIT0_IRQHandler(){
-	debug_printf("cat");
-	debug_printf("Xpos: %5d Xvel: %5d Xacc: %5d\r\n", currentPosition->x, vel_x, acc_x);
-	debug_printf("Xacc: %5d Yacc: %5d Zacc: %5d\r\n", state.x, state.y, state.z);
 	PIT->CHANNEL[0].TFLG |= 1;
-	//debug_printf("Ypos: %5d Yvel: %5d Yacc: %5d\r\n", currentPosition->y, vel_y, acc_y);
-	//debug_printf("Zpos: %5d Zvel: %5d Zacc: %5d\r\n", currentPosition->z, vel_z, acc_z);
-	
+	if(!drawingPause){
+		debug_printf("Xmag: %5d Ymag: %5d\r\n", mag_x, mag_y);
+	}
+	else{
+	  debug_printf("Drawing is Paused");
+	}
 }
 
 //a helper function that just delays a small amount of time
 void delay(){
-	for(int i = 50000; i > 0; i--){}
+	for(int i = 10000; i > 0; i--);
 }
+
 //a helper function that just sets all global
-//values equal to 0 for speed, acceleration, and position
-//and also zeros accelerometer
+//values equal to 0 and sets up all other aspects
 void setup(){
-	
-	//setting the accelerometer offsets
+	//setup the GPIO pins
+	setupGPIO();
+	//initialize the magnetometer
+	Magnetometer_Initialize();
+	pos_x = 0;
+	//setting the magelerometer offsets
 	int tempx = 0;
 	int tempy = 0;
 	int tempz = 0;
 	for(int i = 0; i <1000; i++){
-		Accelerometer_GetState(&state);
+		Magnetometer_GetState(&state);
 		tempx += state.x;
 		tempy += state.y;
 		tempz += state.z;
 	}
-	ACCEL_ZERO_X = tempx/1000;
-	ACCEL_ZERO_Y = tempy/1000;
-	ACCEL_ZERO_Z = tempz/1000;
+	MAG_ZERO_X = tempx/1000;
+	MAG_ZERO_Y = tempy/1000;
+	MAG_ZERO_Z = tempz/1000;
 	
 	//setting all global variables to zero
-	acc_y = 0;
-	acc_x = 0;
-	acc_z = 0;
-	vel_y = 0;
-	vel_x = 0;
-	vel_z = 0; 
+	mag_y = 0;
+	mag_x = 0;
+	mag_z = 0;
+	drawingPause = 0;
+	//begin the PIT timer
+	PIT_begin();
 }
 
-position_t * positionInit(){
-	position_t temp;
-	temp.x = 0.0;
-	temp.y = 0.0;
-	temp.z = 0.0;
-	return &temp;
+
+
+//setup the LED and any other desired pins as GPIO
+void setupGPIO(){
+		NVIC_EnableIRQ(PORTC_IRQn);
+		NVIC_SetPriority(PORTC_IRQn, 3);
+	  //setting up clock 
+	  SIM -> SCGC5 |= (1<<10);      	//ENABLE clock to PORT B
+	  SIM ->SCGC5 |= (1<<13);					//Enable clock to PORT E
+		SIM ->SCGC5 |= (1<<11);					//Enable clock to PORT C
+	
+	
+    //setting pins as GPIO
+	  PORTB -> PCR[21] = (1<<8);    //PTB21 (blue LED) is now GPIO
+	  PORTB -> PCR[22] = (1<<8);		//PTB22 (red LED) is now GPIO
+		PORTE -> PCR[26] = (1<<8);    //PTE26 (green LED) is now GPIO 
+		PORTC -> PCR[6] = (1<<8);			//PTC6 (SW2) is now GPIO
+		
+		//further setup for the SW2 to act as a toggle switch
+		//setting up the pull down resistor and toggle on falling edge
+		PORTC->PCR[6] |= (1<<19);
+		PORTC->PCR[6] |= (1<<17);
+		PORTC->PCR[6] |= (1<<16);
+		PORTC->PCR[6] |= 0x3;
+	
+    //setting up pins as outputs
+		PTB -> PDDR |= (1<<21);
+		PTB -> PDDR |= (1<<22);
+		PTE -> PDDR |= (1<<26);
+		
+		//setting up the SW2 as an input
+		PTC -> PDDR &= ~(1<<6);
+		
+		//turning off the LEDs initially
+		PTB->PTOR |= (1<<21); // blue LED toggle
+		PTB->PTOR |= (1<<22);
+		PTE->PTOR |= (1<<26); // green LED toggle
 }
