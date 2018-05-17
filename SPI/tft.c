@@ -1,5 +1,6 @@
 #include "tft.h"
-#include "MK64F12.h"
+#include <fsl_device_registers.h>
+//#include "MK64F12.h"
 #include "milliseconds.h"
 
 /* Lower Level Function */
