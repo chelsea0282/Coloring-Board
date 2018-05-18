@@ -2,15 +2,15 @@
 #define TFT_H
 
 #include <stdint.h>
-
+#include <fsl_device_registers.h>
 #ifndef TFT_CLK
 #	define TFT_CLK PORTE, PTE, 26
 #endif
-#ifndef TFT_MISO
-#	define TFT_MISO PORTD, PTD, 2
-#endif
 #ifndef TFT_MOSI
 #	define TFT_MOSI PORTD, PTD, 0
+#endif
+#ifndef TFT_MISO
+#	define TFT_MISO PORTD, PTD, 2
 #endif
 #ifndef TFT_CS
 #	define TFT_CS PORTB, PTB, 19
